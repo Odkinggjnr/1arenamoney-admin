@@ -1,20 +1,43 @@
-import React from 'react'
-import AdminDashboard from './pages/AdminDashboard'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import MatchesPage from './pages/MatchesPage'
-import './index.css'
-import Server1room1 from './pages/Server1room1'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import AdminDashboard from './pages/AdminDashboard';
+import MatchesPage from './pages/MatchesPage';
+import ServerMonitor1 from './pages/ServerMonitor1';
+import ServerMonitor2 from './pages/ServerMonitor2';
+import './index.css';
+
 const App = () => {
   return (
-    <div>
-     
-        <Routes>
-          <Route path="/" element={<AdminDashboard />} />
+      <Routes>
+        <Route path="/" element={<AdminDashboard />} />
         <Route path="/matches" element={<MatchesPage />} />
-        <Route path='/server1-room1' element={<Server1room1/>}/>
-        </Routes>
-    </div>
-  )
-}
 
-export default App
+        
+        <Route 
+          path="/server/:roomId/:serverId" 
+          element={<ServerRouter />} 
+        />
+      </Routes>
+  );
+};
+
+
+const ServerRouter = () => {
+  const { serverId } = useParams();
+
+  switch (serverId) {
+    case "1":
+      return <ServerMonitor1 />;
+    case "2":
+      return <ServerMonitor2 />;
+    default:
+      return (
+        <div className="min-h-screen flex items-center justify-center text-white text-xl">
+          🚫 Server {serverId} not found
+        </div>
+      );
+  }
+};
+
+export default App;

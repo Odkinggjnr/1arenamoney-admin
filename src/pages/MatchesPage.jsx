@@ -59,13 +59,15 @@ const MatchesPage = () => {
     }
   };
 
-  const handleJoinServer = (roomId, serverId) => {
-    console.log(`Joining Server #${serverId} in Room ${roomId}`);
-  };
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
   const handleBack = () => {
     navigate('/');
+  };
+
+  const handleJoinServer = (roomId, serverId) => {
+    // Navigate to a server-specific page
+    navigate(`/server/${roomId}/${serverId}`);
   };
 
   return (

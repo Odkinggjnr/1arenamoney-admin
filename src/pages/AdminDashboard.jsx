@@ -218,7 +218,7 @@ const AdminDashboard = () => {
                          style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.4), rgba(59,130,246,0.4))' }}
                     />
                     <div className="relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-cyan-400/50 transition-all">
-                      <h3 className={`text-lg font-semibold bg-clip-text text-transparent mb-2 bg-gradient-to-r ${card.color}`}>
+                      <h3 className={`text-lg font-semibold bg-clip-text text-transparent mb-2 bg-linear-to-r ${card.color}`}>
                         {card.title}
                       </h3>
                       <p className="text-2xl md:text-3xl font-bold text-white">{card.value}</p>

@@ -6,6 +6,9 @@ import MatchesPage from './pages/MatchesPage';
 import ServerMonitor1 from './pages/ServerMonitor1';
 import ServerMonitor2 from './pages/ServerMonitor2';
 import './index.css';
+import ServerMonitor3 from './pages/ServerMonitor3';
+import ServerMonitor4 from './pages/ServerMonitor4';
+import ServerMonitor5 from './pages/ServerMonitor5';
 
 const App = () => {
   return (
@@ -31,9 +34,15 @@ const ServerRouter = () => {
       return <ServerMonitor1 />;
     case "2":
       return <ServerMonitor2 />;
+    case "3":
+      return <ServerMonitor3 />;
+    case "4":
+      return <ServerMonitor4 />;
+    case "5":
+      return <ServerMonitor5 />;
     default:
       return (
-        <div className="min-h-screen flex items-center justify-center text-white text-xl">
+        <div className="min-h-screen flex items-center justify-center text-black text-xl">
           🚫 Server {serverId} not found
         </div>
       );

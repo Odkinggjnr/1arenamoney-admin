@@ -1,52 +1,62 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import AdminDashboard from './pages/AdminDashboard';
-import MatchesPage from './pages/MatchesPage';
-import ServerMonitor1 from './pages/ServerMonitor1';
-import ServerMonitor2 from './pages/ServerMonitor2';
-import './index.css';
-import ServerMonitor3 from './pages/ServerMonitor3';
-import ServerMonitor4 from './pages/ServerMonitor4';
-import ServerMonitor5 from './pages/ServerMonitor5';
+import React, { Suspense } from "react";
+import { Routes, Route, useParams } from "react-router-dom";
+import AdminDashboard from "./pages/AdminDashboard";
+import MatchesPage from "./pages/MatchesPage";
+import Loading from "./components/Loading";
+import Players from "./pages/Players";
+import "./index.css";
+import RevenueOverview from "./pages/Revenue";
+
+// Automatically import all ServerMonitor components inside /pages
+const serverModules = import.meta.glob("./pages/ServerMonitor*.jsx");
+
+// Function to dynamically load server components
+const getServerComponent = (roomId, serverId) => {
+  // Calculate component number based on roomId and serverId
+  const componentNumber = (parseInt(roomId) - 1) * 5 + parseInt(serverId);
+  const componentName = `ServerMonitor${componentNumber}`;
+  const filePath = `./pages/${componentName}.jsx`;
+
+  // Check if the component exists in the imported glob map
+  if (!serverModules[filePath]) return null;
+
+  // Lazy load the matched component
+  const ServerComponent = React.lazy(serverModules[filePath]);
+
+  return ServerComponent;
+};
 
 const App = () => {
   return (
-      <Routes>
-        <Route path="/" element={<AdminDashboard />} />
-        <Route path="/matches" element={<MatchesPage />} />
-
-        
-        <Route 
-          path="/server/:roomId/:serverId" 
-          element={<ServerRouter />} 
-        />
-      </Routes>
+    <Routes>
+      <Route path="/home" element={<AdminDashboard />} />
+      <Route path="/matches" element={<MatchesPage />} />
+      <Route path="/players" element={<Players />} />
+      <Route path="/revenue" element={<RevenueOverview/>} />
+      {/* Dynamic server route */}
+      <Route path="/server/:roomId/:serverId" element={<ServerRouter />} />
+    </Routes>
   );
 };
 
-
+// Router component for handling dynamic server pages
 const ServerRouter = () => {
-  const { serverId } = useParams();
+  const { roomId, serverId } = useParams();
+  const ServerComponent = getServerComponent(roomId, serverId);
 
-  switch (serverId) {
-    case "1":
-      return <ServerMonitor1 />;
-    case "2":
-      return <ServerMonitor2 />;
-    case "3":
-      return <ServerMonitor3 />;
-    case "4":
-      return <ServerMonitor4 />;
-    case "5":
-      return <ServerMonitor5 />;
-    default:
-      return (
-        <div className="min-h-screen flex items-center justify-center text-black text-xl">
-          🚫 Server {serverId} not found
-        </div>
-      );
+  if (!ServerComponent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-lg bg-slate-950">
+        🚫 Room {roomId} / Server {serverId} not found or not yet created.
+      </div>
+    );
   }
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <ServerComponent />
+    </Suspense>
+  );
 };
 
 export default App;

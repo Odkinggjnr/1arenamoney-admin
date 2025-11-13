@@ -1,0 +1,329 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Users, Clock, Activity, Trophy, AlertCircle } from 'lucide-react';
+
+const questions = [
+ "Which country is known for the Taj Mahal?",
+  "What is the hardest rock on Earth?",
+  "Which planet is closest to the sun?",
+  "Who invented the light bulb?",
+  "What is the primary language spoken in Brazil?",
+  "Which metal is liquid at room temperature?",
+  "Which country is famous for sushi?",
+  "What is the largest mammal on Earth?",
+  "Which scientist developed the theory of relativity?",
+  "What is the main ingredient in hummus?",
+  "Which city hosted the 2016 Summer Olympics?",
+  "What is the chemical symbol for potassium?",
+  "Which bird is known for its colorful tail feathers?",
+  "What is the fastest land animal in North America?",
+  "Which planet is known as the gas giant with rings?"
+];
+
+const Alert = ({ type = 'info', message, onClose }) => {
+  const colors = {
+    info: 'from-blue-500/20 to-cyan-500/20 border-blue-500/30',
+    success: 'from-blue-600/20 to-sky-600/20 border-blue-600/30',
+    warning: 'from-blue-400/20 to-sky-400/20 border-blue-400/30',
+    error: 'from-blue-700/20 to-cyan-700/20 border-blue-700/30'
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -20, scale: 0.95 }}
+      className={`bg-gradient-to-r ${colors[type]} border backdrop-blur-sm rounded-2xl p-4 mb-4 flex items-center gap-3 shadow-lg`}
+    >
+      <AlertCircle className="w-5 h-5 flex-shrink-0" />
+      <p className="text-sm font-medium flex-1">{message}</p>
+      {onClose && (
+        <button onClick={onClose} className="text-white/60 hover:text-white transition-colors">
+          ✕
+        </button>
+      )}
+    </motion.div>
+  );
+};
+
+export default function ServerMonitor21() {
+    const { roomId, serverId } = useParams();
+    const navigate = useNavigate();
+
+  const [serverData, setServerData] = useState({
+    players: 100,
+    question: 1,
+    time: 10,
+    status: 'Active'
+  });
+  const [logs, setLogs] = useState([
+    { time: new Date().toLocaleTimeString(), msg: '[SYSTEM] Monitoring started for $20 Room - Server 1' }
+  ]);
+  const [alert, setAlert] = useState(null);
+  const logBoxRef = useRef(null);
+
+  const addLog = (msg) => {
+    const time = new Date().toLocaleTimeString();
+    setLogs(prev => [...prev, { time, msg }]);
+  };
+
+  useEffect(() => {
+    if (logBoxRef.current) {
+      logBoxRef.current.scrollTop = logBoxRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setServerData(prev => {
+        if (prev.status === 'Active') {
+          const newTime = prev.time - 1;
+          
+          if (newTime <= 0) {
+            const newQuestion = prev.question + 1;
+            const newPlayers = Math.max(1, prev.players - Math.floor(Math.random() * 10));
+            
+            addLog(`Question ${newQuestion} started — ${newPlayers} players left.`);
+            
+            if (newPlayers <= 1 || newQuestion > questions.length) {
+              addLog('🏆 Server finished — 1 winner remains!');
+              setAlert({ type: 'success', message: '🏆 Game completed! Winner declared!' });
+              return { ...prev, question: newQuestion, time: 10, players: newPlayers, status: 'Finished' };
+            }
+            
+            if (newPlayers < prev.players - 5) {
+              setAlert({ type: 'warning', message: `${prev.players - newPlayers} players eliminated!` });
+            }
+            
+            return { ...prev, question: newQuestion, time: 10, players: newPlayers };
+          }
+          
+          return { ...prev, time: newTime };
+        }
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const getStatusColor = () => {
+    switch (serverData.status) {
+      case 'Active': return 'from-blue-500 to-cyan-500';
+      case 'Waiting': return 'from-blue-400 to-sky-400';
+      case 'Finished': return 'from-blue-700 to-cyan-700';
+      default: return 'from-blue-500 to-cyan-500';
+    }
+  };
+
+    const handleBack = () => {
+        navigate('/matches');
+    }
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-4 md:p-8">
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto"
+      >
+        {/* Header */}
+        <motion.header 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center mb-8"
+        >
+          <motion.img
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            src="https://i.supaimg.com/42dbf38f-2696-4a9f-ae8a-f297b212233b.png"
+            alt="Logo"
+            className="h-16 md:h-20 mx-auto mb-4 rounded-xl shadow-2xl shadow-blue-500/20"
+          />
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+            🧠 Room {roomId} — Server {serverId} Monitoring
+          </h1>
+        </motion.header>
+
+        {/* Alerts */}
+        <AnimatePresence>
+          {alert && (
+            <Alert
+              type={alert.type}
+              message={alert.message}
+              onClose={() => setAlert(null)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Dashboard */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="bg-slate-800/50 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-700/50"
+        >
+          <motion.h2 variants={item} className="text-xl font-bold mb-6 flex items-center gap-2">
+            <Activity className="w-6 h-6 text-blue-400" />
+            Server Overview
+          </motion.h2>
+
+          {/* Info Grid */}
+          <motion.div 
+            variants={container}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+          >
+            <motion.div
+              variants={item}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-5 rounded-2xl backdrop-blur-sm border border-slate-600/30 shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Users className="w-5 h-5 text-blue-400" />
+                <p className="text-sm text-slate-400">Players Remaining</p>
+              </div>
+              <motion.p 
+                key={serverData.players}
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent"
+              >
+                {serverData.players}
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              variants={item}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-5 rounded-2xl backdrop-blur-sm border border-slate-600/30 shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <AlertCircle className="w-5 h-5 text-blue-400" />
+                <p className="text-sm text-slate-400">Current Question</p>
+              </div>
+              <motion.p 
+                key={serverData.question}
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+              >
+                Q{serverData.question}
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              variants={item}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-5 rounded-2xl backdrop-blur-sm border border-slate-600/30 shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Clock className="w-5 h-5 text-blue-400" />
+                <p className="text-sm text-slate-400">Time Left</p>
+              </div>
+              <motion.p 
+                key={serverData.time}
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={`text-3xl font-bold ${serverData.time <= 3 ? 'text-blue-500 animate-pulse' : 'bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent'}`}
+              >
+                {serverData.time}s
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              variants={item}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-5 rounded-2xl backdrop-blur-sm border border-slate-600/30 shadow-lg"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Trophy className="w-5 h-5 text-blue-400" />
+                <p className="text-sm text-slate-400">Status</p>
+              </div>
+              <motion.span
+                key={serverData.status}
+                initial={{ scale: 1.2, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={`inline-block px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r ${getStatusColor()} shadow-lg`}
+              >
+                {serverData.status}
+              </motion.span>
+            </motion.div>
+          </motion.div>
+
+          {/* Current Question */}
+          <motion.div
+            variants={item}
+            key={serverData.question}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 backdrop-blur-sm p-5 rounded-2xl mb-6 border border-blue-500/20"
+          >
+            <p className="text-sm text-blue-400 mb-2 font-semibold">Current Question</p>
+            <p className="text-lg font-medium text-white">
+              {questions[serverData.question - 1] || "No question available"}
+            </p>
+          </motion.div>
+
+          {/* Live Logs */}
+          <motion.div variants={item}>
+            <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-blue-400" />
+              Live Logs
+            </h3>
+            <div
+              ref={logBoxRef}
+              className="bg-slate-900/50 backdrop-blur-sm p-4 rounded-2xl max-h-64 overflow-y-auto border border-slate-700/30 space-y-2"
+            >
+              <AnimatePresence initial={false}>
+                {logs.map((log, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="text-sm text-slate-300 font-mono bg-slate-800/30 p-2 rounded-lg"
+                  >
+                    <span className="text-blue-400">[{log.time}]</span> {log.msg}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-center mt-8"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 px-8 py-3 rounded-full font-semibold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 transition-shadow"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back to Matches
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}

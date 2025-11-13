@@ -6,10 +6,10 @@ import { useNavigate } from 'react-router-dom';
 const MatchesPage = () => {
   const [rooms] = useState([
     { id: 1, name: "$1 Room", img: "https://i.supaimg.com/f19f4f97-1562-4714-8be3-1b1e4b1a3478.jpg", max: "$80" },
-    { id: 5, name: "$5 Room", img: "https://i.supaimg.com/335a2cb1-a511-40f1-90b4-418dd08f32dd.jpg", max: "$400" },
-    { id: 10, name: "$10 Room", img: "https://i.supaimg.com/c2276bf6-1b7f-47c4-8dc1-576921839bf8.jpg", max: "$800" },
-    { id: 15, name: "$15 Room", img: "https://i.supaimg.com/2cc005e6-4985-4d8d-8015-55a33c0b6a8a.jpg", max: "$1,200" },
-    { id: 20, name: "$20 Room", img: "https://i.supaimg.com/34cac5bd-11c1-4ac5-a358-41c3390874f3.jpg", max: "$1,600" }
+    { id: 2, name: "$5 Room", img: "https://i.supaimg.com/335a2cb1-a511-40f1-90b4-418dd08f32dd.jpg", max: "$400" },
+    { id: 3, name: "$10 Room", img: "https://i.supaimg.com/c2276bf6-1b7f-47c4-8dc1-576921839bf8.jpg", max: "$800" },
+    { id: 4, name: "$15 Room", img: "https://i.supaimg.com/2cc005e6-4985-4d8d-8015-55a33c0b6a8a.jpg", max: "$1,200" },
+    { id: 5, name: "$20 Room", img: "https://i.supaimg.com/34cac5bd-11c1-4ac5-a358-41c3390874f3.jpg", max: "$1,600" }
   ]);
 
   const [servers, setServers] = useState(() => {
@@ -66,7 +66,6 @@ const MatchesPage = () => {
   };
 
   const handleJoinServer = (roomId, serverId) => {
-    // Navigate to a server-specific page
     navigate(`/server/${roomId}/${serverId}`);
   };
 

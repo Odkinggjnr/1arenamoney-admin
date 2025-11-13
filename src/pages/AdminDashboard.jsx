@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -13,8 +13,8 @@ import {
   RefreshCw,
   Wrench
 } from 'lucide-react';
+import Loading from '../components/Loading'; 
 
-// Generate random members
 const generateMembers = (count) => {
   const firstNames = ["Alpha","Beta","Gamma","Delta","Nova","Cyber","Shadow","Iron","Jet","Omega","Star","Luna","Pixel","Neo","Dark","Blaze","Venus","Galaxy","Hydra","Quantum"];
   const lastNames = ["Rider","Hunter","Storm","Blade","Knight","Fox","Bolt","Jet","King","Master","Wolf","Dragon","Hawk","Phoenix","Pulse","Edge","Force","Soul","Titan","Fire"];
@@ -39,6 +39,7 @@ const AdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [members] = useState(() => generateMembers(1000));
   const [toast, setToast] = useState(null);
+  const [loading, setLoading] = useState(false); // <-- loading state added
 
   const showToast = (message) => {
     setToast(message);
@@ -68,9 +69,16 @@ const AdminDashboard = () => {
     );
   }, [members, searchQuery]);
 
+  
   const handleSectionChange = (sectionId) => {
-    setActiveSection(sectionId);
-    setSidebarOpen(false);
+   
+    setLoading(true);
+    
+    setTimeout(() => {
+      setActiveSection(sectionId);
+      setSidebarOpen(false);
+      setLoading(false);
+    }, 1400);
   };
 
   const handleAction = (action) => {
@@ -79,13 +87,39 @@ const AdminDashboard = () => {
 
   const handleCardClick = (path) => {
     if (path) {
-      console.log(`Navigating to: ${path}`);
-      showToast(`Navigating to ${path}`);
+      
+      setLoading(true);
+      
+      setTimeout(() => {
+        showToast(`Navigating to ${path}`);
+        setLoading(false);
+      }, 1000);
     }
   };
 
+ 
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => setLoading(false), 5000);
+    return () => clearTimeout(t);
+  }, [loading]);
+
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-cyan-950 text-white">
+      {/* Fullscreen Loading Overlay */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          >
+            <Loading />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Custom Toast Notification */}
       <AnimatePresence>
         {toast && (
@@ -93,7 +127,7 @@ const AdminDashboard = () => {
             initial={{ opacity: 0, y: -50, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: -50, x: '-50%' }}
-            className="fixed top-4 left-1/2 z-50 bg-linear-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-xl shadow-2xl shadow-cyan-500/50 font-medium"
+            className="fixed top-4 left-1/2 z-9999 bg-linear-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-xl shadow-2xl shadow-cyan-500/50 font-medium"
           >
             {toast}
           </motion.div>
@@ -211,7 +245,12 @@ const AdminDashboard = () => {
                   >
                     <Link
                       to={card.path}
-                      onClick={() => showToast(`Navigating to ${card.title}`)}
+                      onClick={() => {
+                        // show loading briefly
+                        setLoading(true);
+                        setTimeout(() => setLoading(false), 1200);
+                        showToast(`Navigating to ${card.title}`);
+                      }}
                       className="absolute inset-0 z-10"
                     />
                     <div className="absolute inset-0 bg-linear-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl blur-xl" 

@@ -110,7 +110,7 @@ export default function FinanceAdmin() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex items-center gap-3"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center font-bold text-xl ml-8">
+              <div className="w-12 h-12 bg-linear-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center font-bold text-xl ml-8">
                 1M
               </div>
               <h1 className="text-sm sm:text-xl font-bold uppercase tracking-wider text-cyan-400">

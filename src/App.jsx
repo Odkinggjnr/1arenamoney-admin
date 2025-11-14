@@ -1,11 +1,16 @@
 import React, { Suspense } from "react";
-import { Routes, Route, useParams } from "react-router-dom";
+import { Routes, Route, useParams, Navigate } from "react-router-dom";
 import AdminDashboard from "./pages/AdminDashboard";
 import MatchesPage from "./pages/MatchesPage";
 import Loading from "./components/Loading";
 import Players from "./pages/Players";
 import "./index.css";
 import RevenueOverview from "./pages/Revenue";
+import Withdrawals from "./pages/Withdrawals";
+import FinanceAdmin from "./pages/FinanceAdmin";
+import GameAdmin from "./pages/GameAdmin";
+import Moderator from "./pages/Moderator";
+import SupportAdmin from "./pages/SupportAdmin";
 
 // Automatically import all ServerMonitor components inside /pages
 const serverModules = import.meta.glob("./pages/ServerMonitor*.jsx");
@@ -29,10 +34,19 @@ const getServerComponent = (roomId, serverId) => {
 const App = () => {
   return (
     <Routes>
+      {/* FIX ADDED HERE */}
+      <Route path="/" element={<Navigate to="/home" replace />} />
+
       <Route path="/home" element={<AdminDashboard />} />
       <Route path="/matches" element={<MatchesPage />} />
       <Route path="/players" element={<Players />} />
-      <Route path="/revenue" element={<RevenueOverview/>} />
+      <Route path="/revenue" element={<RevenueOverview />} />
+      <Route path="/withdrawals" element={<Withdrawals />} />
+      <Route path="/finance-admin" element={<FinanceAdmin />} />
+      <Route path="/game-admin" element={<GameAdmin />} />
+      <Route path="/moderator" element={<Moderator />} />
+      <Route path="/support-admin" element={<SupportAdmin />} />
+
       {/* Dynamic server route */}
       <Route path="/server/:roomId/:serverId" element={<ServerRouter />} />
     </Routes>

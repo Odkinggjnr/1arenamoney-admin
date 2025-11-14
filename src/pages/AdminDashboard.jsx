@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Menu, 
   X, 
@@ -34,12 +34,14 @@ const generateMembers = (count) => {
 };
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [members] = useState(() => generateMembers(1000));
   const [toast, setToast] = useState(null);
-  const [loading, setLoading] = useState(false); // <-- loading state added
+  const [loading, setLoading] = useState(false); 
 
   const showToast = (message) => {
     setToast(message);
@@ -54,10 +56,10 @@ const AdminDashboard = () => {
   ];
 
   const adminRoles = [
-    { role: 'Finance Admin', responsibilities: 'Handles money, transactions, and withdrawals.', page: 'financeadmin.html' },
-    { role: 'Support Admin', responsibilities: 'Manages users, disputes, and support tickets.', page: 'supportadmin.html' },
-    { role: 'Game Admin', responsibilities: 'Oversees matches, tournaments, and player management.', page: 'gameadmin.html' },
-    { role: 'Moderator', responsibilities: 'Handles reports, chat moderation, and bans.', page: 'moderator.html' },
+    { role: 'Finance Admin', responsibilities: 'Handles money, transactions, and withdrawals.', path: '/finance-admin' },
+    { role: 'Support Admin', responsibilities: 'Manages users, disputes, and support tickets.', path: '/support-admin' },
+    { role: 'Game Admin', responsibilities: 'Oversees matches, tournaments, and player management.', path: '/game-admin' },
+    { role: 'Moderator', responsibilities: 'Handles reports, chat moderation, and bans.', path: '' },
   ];
 
   const filteredMembers = useMemo(() => {
@@ -290,29 +292,35 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {adminRoles.map((admin, idx) => (
-                      <motion.tr
-                        key={idx}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                      >
-                        <td className="px-4 py-4 text-sm md:text-base font-medium text-white">{admin.role}</td>
-                        <td className="px-4 py-4 text-sm text-slate-300 hidden md:table-cell">{admin.responsibilities}</td>
-                        <td className="px-4 py-4 text-right">
-                          <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => handleAction(`Editing ${admin.role}`)}
-                            className="px-4 py-2 bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-xl text-sm font-semibold shadow-lg hover:shadow-cyan-500/50 transition-all"
-                          >
-                            Edit
-                          </motion.button>
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
+  {adminRoles.map((admin, idx) => (
+    <motion.tr
+      key={idx}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: idx * 0.1 }}
+      className="border-b border-white/5 hover:bg-white/5 transition-colors"
+    >
+      <td className="px-4 py-4 text-sm md:text-base font-medium text-white">{admin.role}</td>
+      <td className="px-4 py-4 text-sm text-slate-300 hidden md:table-cell">{admin.responsibilities}</td>
+      <td className="px-4 py-4 text-right">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            setLoading(true); 
+            setTimeout(() => {
+              navigate(admin.path); 
+              setLoading(false);
+            }, 500);
+          }}
+          className="px-4 py-2 bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-xl text-sm font-semibold shadow-lg hover:shadow-cyan-500/50 transition-all"
+        >
+          Edit
+        </motion.button>
+      </td>
+    </motion.tr>
+  ))}
+</tbody>
                 </table>
               </div>
             </motion.section>

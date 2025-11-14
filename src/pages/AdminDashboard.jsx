@@ -156,7 +156,7 @@ const AdminDashboard = () => {
               transition={{ duration: 0.6 }}
               src="https://i.supaimg.com/42dbf38f-2696-4a9f-ae8a-f297b212233b.png" 
               alt="Logo" 
-              className="w-12 h-12 rounded-xl shadow-lg shadow-cyan-500/50"
+              className="w-28 h-16 rounded-xl shadow-lg shadow-cyan-500/50"
             />
             <h1 className="text-sm md:text-lg font-bold text-cyan-400 tracking-wider mt-1 uppercase">
               1MoneyArena Admin
